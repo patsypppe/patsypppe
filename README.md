@@ -1,109 +1,75 @@
-# Pranav T Pattanashetty
-
-**Applied machine learning and the infrastructure it runs on.**
-M.S. Computer Science at Indiana University Bloomington. Software Development Engineer Intern at SparkFX.
-
-I work on the part of ML that comes after the model trains: making a result reproducible, cheap to run,
-and inspectable when it gets something wrong. Most recently that has meant building an evaluation harness
-that decides whether an agent change is an improvement or a regression, and can prove the same answer
-tomorrow. Before that, three peer-reviewed papers across video classification, biosignal analysis, and
-evolutionary optimization of language models, plus a ride-sharing backend built end to end on AWS
-managed services with Terraform.
-
----
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/terminal-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.svg">
+  <img alt="Pranav T Pattanashetty. Applied machine learning, and the infrastructure it runs on. M.S. Computer Science at Indiana University, May 2027. SDE Intern at SparkFX working on agent orchestration in TypeScript. Three peer-reviewed papers across vision, biosignals, and LLM tuning. Based in Bloomington, Indiana. Stack: PyTorch, TensorFlow, Hugging Face, scikit-learn, OpenCV, AWS Lambda, API Gateway, DynamoDB, Terraform, Docker, PostgreSQL, Alembic, pandas, NumPy, SQL, mypy strict, ruff, pytest." src="assets/terminal-light.svg">
+</picture>
 
 ## Featured work
 
-### [meridian](https://github.com/patsypppe/meridian) · agent evaluation harness
+**[meridian](https://github.com/patsypppe/meridian)** · agent evaluation harness
 
 Answers one question: did this change make the agent better or worse, and can you reproduce that answer
-tomorrow. Every trial runs in its own container with its own workdir volume, so nothing leaks between
-runs. Scoring uses `pass^k` rather than a single accuracy number, because an agent that passes once in
-five attempts is not an agent that passes. A PR gate compares head against the merge base and blocks the
-merge only when the drop clears both a tolerance and a significance test.
+tomorrow. Every trial runs in its own container with its own workdir volume, and the suite ships a
+contamination probe with a deliberate failing direction so isolation is asserted rather than assumed.
+Scoring uses `pass^k` rather than a single accuracy number. A PR gate compares head against the merge
+base and blocks only when the drop clears both a tolerance and a significance test.
 
-Python 3.12, Typer, Docker, Postgres with Alembic, Starlette recording proxy, `mypy --strict` and ruff
-enforced in CI, 226 unit tests green in under three seconds.
+`Python 3.12` `Typer` `Docker` `Postgres + Alembic` `Starlette` — `mypy --strict` and `ruff` enforced in
+CI, 226 unit tests green in under three seconds.
 
-### [ridesharing-app](https://github.com/patsypppe/ridesharing-app) · serverless AWS backend
+**[ridesharing-app](https://github.com/patsypppe/ridesharing-app)** · serverless AWS backend
 
-Six Lambda-backed services (user, driver, ride, payment, notification, websocket) behind an HTTP API
-Gateway, with a separate WebSocket API for live location, DynamoDB for state, and Cognito for auth. The
-environment is declared in Terraform rather than clicked together in the console. Written as an
-infrastructure and architecture study, not a deployed product: the README says exactly which pieces are
+Six Lambda-backed services behind an HTTP API Gateway, a separate WebSocket API for live location,
+DynamoDB for state, Cognito for auth, and the environment declared in Terraform rather than clicked
+together in a console. Written as an infrastructure study, and the README says plainly which pieces are
 built and which are not.
 
-Node.js, Terraform, AWS Lambda, DynamoDB, API Gateway v2, Cognito, CloudFront, EventBridge, SNS.
+`Node.js` `Terraform` `Lambda` `DynamoDB` `API Gateway v2` `Cognito` `EventBridge`
 
-### [Cricket-Shot-Detection](https://github.com/patsypppe/Cricket-Shot-Detection) · video classification with physics constraints
+**[Cricket-Shot-Detection](https://github.com/patsypppe/Cricket-Shot-Detection)** · video classification with physics constraints
 
-Classifies cricket batting shots from video across five model variants, including a Vision Transformer,
-a 3D ResNet, a CNN-GRU with key-frame selection, and a physics-informed model that adds temporal
-continuity, energy conservation, and momentum conservation terms to the classification loss. Grad-CAM is
-wired into the prediction path so a call can be inspected frame by frame instead of trusted on an
-aggregate. Backs a peer-reviewed publication.
+Five model variants over the same seven-class problem, written to be compared: a CNN-GRU with key-frame
+selection, a MobileNet baseline, a 3D ResNet with Vision Transformer, and a physics-informed model that
+adds temporal continuity, energy, and momentum terms to the classification loss. A bat swing is a smooth
+trajectory, so a model whose per-frame beliefs jump around is wrong even when its final answer is right.
 
-PyTorch, Hugging Face Transformers, OpenCV, Weights & Biases, scikit-learn.
+`PyTorch` `ViT` `3D ResNet` `Grad-CAM` `Weights & Biases`
 
-### [Bio-inspired-computing](https://github.com/patsypppe/Bio-inspired-computing) · fine-tuning language models by evolutionary search
+**[Bio-inspired-computing](https://github.com/patsypppe/Bio-inspired-computing)** · fine-tuning by evolutionary search
 
-Asks how much of a pre-trained model to freeze during fine-tuning by searching for the answer instead of
-guessing it. A genetic algorithm and the Whale Optimization Algorithm both search over freezing
-percentage and crossover operator for RoBERTa on SST-2. Two findings held across every configuration:
-SBX crossover wins, and less freezing wins. Best result 94.67% accuracy. Backs a peer-reviewed
-publication.
+How much of a pre-trained model should you freeze? Usually a guess. This searches for the answer instead:
+a genetic algorithm and the Whale Optimization Algorithm over freezing percentage and crossover operator
+for RoBERTa on SST-2. Two findings held across every configuration: SBX crossover wins, and less freezing
+wins. Best result 94.67% accuracy.
 
-PyTorch, Hugging Face Transformers and Datasets, genetic algorithms, mixed-precision inference.
+`PyTorch` `Hugging Face` `RoBERTa` `genetic algorithms` `SST-2`
 
-### [EMG-Dumbbell-press](https://github.com/patsypppe/EMG-Dumbbell-press) · exercise form from surface EMG
+**[EMG-Dumbbell-press](https://github.com/patsypppe/EMG-Dumbbell-press)** · exercise form from surface EMG
 
-Turns raw two-channel surface EMG into a Good / Fair / Bad form label for a dumbbell press. The useful
-signal turned out to be the balance between the deltoid and pectoral channels rather than either alone,
-so the pipeline computes per-channel RMS, skewness, kurtosis, and integrated area over sliding windows
-and classifies their scaled difference. Best validation accuracy in the committed notebooks is 92.5%, on
-a small (~80 sample) split. Backs a peer-reviewed publication.
+A signal problem before it is a modelling problem. Neither the deltoid nor the pectoral channel says much
+alone, so the pipeline computes windowed RMS, integrated area, skewness and kurtosis per channel and
+classifies the balance between them. Best validation accuracy in the committed notebooks is 92.5%, on a
+small (~80 sample) split, which the README states alongside the figure.
 
-TensorFlow/Keras, LSTM and recurrent models, pandas, SciPy, scikit-learn.
-
----
+`TensorFlow/Keras` `LSTM` `SciPy` `pandas`
 
 ## Research
 
 Three peer-reviewed conference papers, in computer vision, biosignal processing, and LLM optimization.
-Each has a public repository above. Citations and DOIs are on my
-[LinkedIn](https://www.linkedin.com/in/pranavpattanashetty); email me if you would like the PDFs.
-
----
-
-## Technologies
-
-**Machine learning** PyTorch · TensorFlow/Keras · Hugging Face Transformers · scikit-learn · OpenCV ·
-Weights & Biases · NumPy · pandas · SciPy
-
-**Backend and infrastructure** Python · Node.js · Terraform · Docker · AWS (Lambda, API Gateway,
-DynamoDB, Cognito, S3, CloudFront, EventBridge, SNS) · PostgreSQL · Alembic · GitHub Actions · Jenkins
-
-**Frontend** React · TypeScript · Next.js · Tailwind CSS
-
-**Tooling I care about** `mypy --strict` · ruff · pytest · reproducible builds and lockfiles
-
-AWS Certified Cloud Practitioner.
-
----
+Each has a public repository above. Citations and DOIs are on
+[LinkedIn](https://www.linkedin.com/in/pranavpattanashetty), or email me for the PDFs.
 
 ## Currently
 
-Building [meridian](https://github.com/patsypppe/meridian), an agent evaluation harness, toward a
-release that a team other than mine could adopt. At SparkFX I work on agent-based issue triage in a
-Next.js and TypeScript codebase.
+Building [meridian](https://github.com/patsypppe/meridian) toward a release a team other than mine could
+adopt. At SparkFX, agent-based issue triage in a Next.js and TypeScript codebase.
 
-Graduating May 2027 and open to new-grad software, machine learning, and cloud engineering roles in the
-United States.
-
----
+Graduating May 2027, open to new-grad software, machine learning, and cloud engineering roles in the US.
 
 ## Contact
 
-- Email: [ppattana@iu.edu](mailto:ppattana@iu.edu)
-- LinkedIn: [pranavpattanashetty](https://www.linkedin.com/in/pranavpattanashetty)
-- Bloomington, Indiana
+[ppattana@iu.edu](mailto:ppattana@iu.edu) · [LinkedIn](https://www.linkedin.com/in/pranavpattanashetty) · Bloomington, Indiana
+
+<sub>The panel above is a static SVG generated by <a href="assets/gen.py"><code>assets/gen.py</code></a>.
+No stats service, no API token, no scheduled job, nothing that can decay into "no activity tracked".
+Regenerate with <code>python3 assets/gen.py</code>.</sub>
