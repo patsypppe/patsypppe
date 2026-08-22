@@ -10,12 +10,31 @@
 
 Answers one question: did this change make the agent better or worse, and can you reproduce that answer
 tomorrow. Every trial runs in its own container with its own workdir volume, and the suite ships a
-contamination probe with a deliberate failing direction so isolation is asserted rather than assumed.
-Scoring uses `pass^k` rather than a single accuracy number. A PR gate compares head against the merge
-base and blocks only when the drop clears both a tolerance and a significance test.
+contamination probe with a deliberate failing direction — isolation is asserted rather than assumed,
+because a probe that cannot fail proves nothing. Scoring uses `pass^k` rather than a single accuracy
+number. A PR gate compares head against the merge base and blocks only when the drop clears both a
+tolerance and a paired significance test.
 
-`Python 3.12` `Typer` `Docker` `Postgres + Alembic` `Starlette` — `mypy --strict` and `ruff` enforced in
-CI, 226 unit tests green in under three seconds.
+Two things it does that the tools it sits beside do not:
+
+*It never trusts the container.* Assertions run on state extracted to the host, after the container is
+gone. In 2026 researchers broke several major agent benchmarks through exactly that hole — agents writing
+a `conftest.py` that rewrote every test result to `passed`, or replacing `/usr/bin/curl` to emit fake
+output. The same rule now applies to Meridian's own task files, since in a CI gate a pull request
+*is* the untrusted input: a security pass found a path traversal that could read a host file and print it
+into a public PR comment, and closed it along with four smaller siblings.
+
+*It reports its own blind spot.* Every verdict carries the minimum detectable effect — "this run could
+only have caught a drop of 0.183 or larger; resolving your 0.030 tolerance would take about 262 tasks."
+A PASS from an underpowered suite is not evidence that nothing broke, and a gate that reports those
+identically teaches people to trust it exactly when it is least reliable.
+
+It is also measured by itself, and publishes the result including the miss: 0/30 false regressions,
+4/5 seeded regressions caught, 5/5 replay fidelity. The one it misses is explained with the arithmetic
+rather than tuned away.
+
+`Python 3.12+` `Typer` `Docker` `Postgres + Alembic` `Starlette` `numpy` — `mypy --strict` and `ruff`
+enforced in CI, 331 tests across unit, Docker-backed integration, and end-to-end layers.
 
 **[ridesharing-app](https://github.com/patsypppe/ridesharing-app)** · serverless AWS backend
 
@@ -62,7 +81,9 @@ Each has a public repository above. Citations and DOIs are on
 ## Currently
 
 Building [meridian](https://github.com/patsypppe/meridian) toward a release a team other than mine could
-adopt. At SparkFX, agent-based issue triage in a Next.js and TypeScript codebase.
+adopt — currently working through an external audit of its own threat model, and reading the 2026
+literature on eval variance closely enough to argue with it. At SparkFX, agent-based issue triage in a
+Next.js and TypeScript codebase.
 
 Graduating May 2027, open to new-grad software, machine learning, and cloud engineering roles in the US.
 
