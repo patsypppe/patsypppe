@@ -16,7 +16,7 @@ PAD_X = 30
 TITLEBAR = 40
 TOP_GAP = 26
 BOT_PAD = 26
-WIDTH = 900
+WIDTH = 980
 
 MONO = "ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace"
 
@@ -35,33 +35,64 @@ THEMES = {
     },
 }
 
-# Each entry: ("rule",) | ("gap",) | list of (text, colour-key) segments
+# Key/value rows under `cat profile.txt`. Padded to a common column below.
+PROFILE = [
+    ("role", "M.S. Computer Science, Indiana University (May 2027)"),
+    ("now", "SDE Intern @ SparkFX, agent orchestration in TypeScript"),
+    ("research", "3 peer-reviewed papers: vision, biosignals, LLM tuning"),
+    ("where", "Bloomington, Indiana"),
+]
+
+STACK = [
+    ("ml", "PyTorch  TensorFlow  Hugging Face  scikit-learn  OpenCV"),
+    ("services", "Go  Python  TypeScript  Envoy  JSON-RPC  OpenTelemetry"),
+    ("cloud", "AWS Lambda  API Gateway  DynamoDB  Terraform  Docker"),
+    ("data", "PostgreSQL  Alembic  pandas  NumPy  SQL"),
+    ("rigor", "mypy --strict  ruff  golangci-lint  pytest  go test -race"),
+]
+
+# Repo name -> one-line summary, in the order they are pinned.
+FEATURED = [
+    ("sentinel", "MCP conformance harness, and the server it grades"),
+    ("meridian", "agent eval harness, pass^k, CI merge gate"),
+    ("serverless-rideshare-aws", "six Lambda services, Terraform, WebSockets"),
+    ("cricket-shot-classification", "ViT, 3D ResNet, physics-informed loss"),
+    ("metaheuristic-llm-finetuning", "GA and whale optimization, 94.67%"),
+    ("EMG-Dumbbell-press", "biosignal form classification, LSTM"),
+]
+
+
+def _kv(rows, gap=3):
+    """Left-align values into one column, whatever the longest key is."""
+    w = max(len(k) for k, _ in rows) + gap
+    return [[("  " + k.ljust(w), "key"), (v, "text")] for k, v in rows]
+
+
+def _ls(rows, gap=2):
+    w = max(len(n) for n, _ in rows) + 1 + gap
+    return [[("  " + (n + "/").ljust(w), "path"), (d, "muted")] for n, d in rows]
+
+
+def _prompt(cmd):
+    return [("pranav@github", "path"), (" ~ ", "muted"), ("$", "accent"), (" " + cmd, "text")]
+
+
 LINES = [
-    [("pranav@github", "path"), (" ~ ", "muted"), ("$", "accent"), (" whoami", "text")],
+    _prompt("whoami"),
     ("gap",),
     [("  Pranav T Pattanashetty", "text")],
     [("  Applied machine learning, and the infrastructure it runs on.", "muted")],
     ("gap",),
-    [("pranav@github", "path"), (" ~ ", "muted"), ("$", "accent"), (" cat profile.txt", "text")],
+    _prompt("cat profile.txt"),
     ("gap",),
-    [("  role       ", "key"), ("M.S. Computer Science, Indiana University (May 2027)", "text")],
-    [("  now        ", "key"), ("SDE Intern @ SparkFX, agent orchestration in TypeScript", "text")],
-    [("  research   ", "key"), ("3 peer-reviewed papers: vision, biosignals, LLM tuning", "text")],
-    [("  where      ", "key"), ("Bloomington, Indiana", "text")],
+    *_kv(PROFILE),
     ("gap",),
     ("head", "  stack"),
-    [("  ml         ", "key"), ("PyTorch  TensorFlow  Hugging Face  scikit-learn  OpenCV", "text")],
-    [("  cloud      ", "key"), ("AWS Lambda  API Gateway  DynamoDB  Terraform  Docker", "text")],
-    [("  data       ", "key"), ("PostgreSQL  Alembic  pandas  NumPy  SQL", "text")],
-    [("  rigor      ", "key"), ("mypy --strict  ruff  pytest  reproducible builds", "text")],
+    *_kv(STACK),
     ("gap",),
-    [("pranav@github", "path"), (" ~ ", "muted"), ("$", "accent"), (" ls featured/", "text")],
+    _prompt("ls featured/"),
     ("gap",),
-    [("  meridian/                ", "path"), ("agent eval harness, pass^k, CI merge gate", "muted")],
-    [("  ridesharing-app/         ", "path"), ("six Lambda services, Terraform, WebSockets", "muted")],
-    [("  Cricket-Shot-Detection/  ", "path"), ("ViT, 3D ResNet, physics-informed loss", "muted")],
-    [("  Bio-inspired-computing/  ", "path"), ("metaheuristic LLM fine-tuning, 94.67%", "muted")],
-    [("  EMG-Dumbbell-press/      ", "path"), ("biosignal form classification, LSTM", "muted")],
+    *_ls(FEATURED),
     ("gap",),
     [("pranav@github", "path"), (" ~ ", "muted"), ("$", "accent"), (" █", "text")],
 ]
@@ -133,8 +164,20 @@ def build(theme_name: str) -> str:
     return "\n".join(out)
 
 
+def widest() -> int:
+    """Longest rendered line, for checking nothing overflows the panel."""
+    n = 0
+    for line in LINES:
+        if isinstance(line, tuple):
+            continue
+        n = max(n, sum(len(t) for t, _ in line))
+    return n
+
+
 if __name__ == "__main__":
     here = Path(__file__).parent
+    over = PAD_X * 2 + widest() * CW
+    assert over <= WIDTH, f"content is {over:.0f}px wide, panel is {WIDTH}px"
     for name in THEMES:
         p = here / f"terminal-{name}.svg"
         p.write_text(build(name), encoding="utf-8")
