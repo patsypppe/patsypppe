@@ -95,8 +95,14 @@ wins. Best result 94.67% accuracy.
 
 A signal problem before it is a modelling problem. Neither the deltoid nor the pectoral channel says much
 alone, so the pipeline computes windowed RMS, integrated area, skewness and kurtosis per channel and
-classifies the balance between them. Best validation accuracy in the committed notebooks is 92.5%, on a
-small (~80 sample) split, which the README states alongside the figure.
+classifies the balance between them.
+
+Re-reading it recently turned up target leakage: the label is a threshold on a quantity that is also one
+of the model's input columns, so a three-line rule reproduces every label exactly and the accuracies in
+the notebooks measure nothing about EMG. The README now leads with that instead of the number, and says
+what would be needed to make the question answerable — labels from outside the signal, and a split that
+does not put 97%-overlapping windows on both sides. Left up rather than quietly corrected, because the
+paper is published and the reasoning is more useful than the figure was.
 
 `TensorFlow/Keras` `LSTM` `SciPy` `pandas`
 
