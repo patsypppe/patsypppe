@@ -38,7 +38,7 @@ THEMES = {
 # Key/value rows under `cat profile.txt`. Padded to a common column below.
 PROFILE = [
     ("role", "M.S. Computer Science, Indiana University (May 2027)"),
-    ("now", "SDE Intern @ SparkFX, agent orchestration in TypeScript"),
+    ("intern", "SDE Intern @ SparkFX (Jun–Aug 2026)"),
     ("research", "3 peer-reviewed papers: vision, biosignals, LLM tuning"),
     ("where", "Bloomington, Indiana"),
 ]

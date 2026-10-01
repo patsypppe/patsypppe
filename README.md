@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/terminal-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.svg">
-  <img alt="Pranav T Pattanashetty. Applied machine learning, and the infrastructure it runs on. M.S. Computer Science at Indiana University, May 2027. SDE Intern at SparkFX working on agent orchestration in TypeScript. Three peer-reviewed papers across vision, biosignals, and LLM tuning. Based in Bloomington, Indiana. Stack: PyTorch, TensorFlow, Hugging Face, scikit-learn, OpenCV, Go, Python, TypeScript, Envoy, JSON-RPC, OpenTelemetry, AWS Lambda, API Gateway, DynamoDB, Terraform, Docker, PostgreSQL, Alembic, pandas, NumPy, SQL, mypy strict, ruff, golangci-lint, pytest, go test -race. Featured repositories: sentinel, meridian, serverless-rideshare-aws, cricket-shot-classification, metaheuristic-llm-finetuning, EMG-Dumbbell-press." src="assets/terminal-light.svg">
+  <img alt="Pranav T Pattanashetty. Applied machine learning, and the infrastructure it runs on. M.S. Computer Science at Indiana University, May 2027. SDE Intern at SparkFX, June to August 2026. Three peer-reviewed papers across vision, biosignals, and LLM tuning. Based in Bloomington, Indiana. Stack: PyTorch, TensorFlow, Hugging Face, scikit-learn, OpenCV, Go, Python, TypeScript, Envoy, JSON-RPC, OpenTelemetry, AWS Lambda, API Gateway, DynamoDB, Terraform, Docker, PostgreSQL, Alembic, pandas, NumPy, SQL, mypy strict, ruff, golangci-lint, pytest, go test -race. Featured repositories: sentinel, meridian, serverless-rideshare-aws, cricket-shot-classification, metaheuristic-llm-finetuning, EMG-Dumbbell-press." src="assets/terminal-light.svg">
 </picture>
 
 ## Featured work
@@ -118,7 +118,7 @@ Building [sentinel](https://github.com/patsypppe/sentinel) out from its MVP tier
 left out are named in its scope section, and the next ones in are consent-registry authorization and
 `subscriptions/listen`. Alongside it, taking [meridian](https://github.com/patsypppe/meridian) toward a
 release a team other than mine could adopt, and reading the 2026 literature on eval variance closely
-enough to argue with it. At SparkFX, agent-based issue triage in a Next.js and TypeScript codebase.
+enough to argue with it.
 
 The longer version of all of this, with architecture diagrams, is at
 [patsypppe.github.io](https://patsypppe.github.io) — Astro and TypeScript, no client-side JavaScript,
