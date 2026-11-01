@@ -30,9 +30,22 @@ rather than being redefined in place — which would silently rewrite every repo
 them — they were deprecated and republished under new IDs, with the old ones still evaluable behind a
 flag so an earlier report can be reproduced and diffed.
 
-`Go` `Python` `Envoy` `PostgreSQL` `OpenTelemetry` `SARIF` — 13k lines of Go and 5.7k of Python across 36
-test files, `golangci-lint`, `go test -race`, `mypy` and `ruff` enforced in CI, and no model API key
-required anywhere, which is why the suite is fast and never flaky for a reason outside the repository.
+It has also been pointed at the ecosystem. Run against every remote server in the official MCP registry
+(15,451 endpoints, safe mode, GitHub Actions), only 14.6% already speak the new revision, and on a
+4,000-endpoint sample 16% of those pass every required rule that can be checked from outside. The first
+scan said 13 of 2,263; reading what the failing servers actually answered showed two false-positive
+classes (rate-limit and auth replies counted as findings), so the numbers above are from the corrected
+rerun, and the correction is in the changelog rather than quietly replaced. A separate lint reads tool
+descriptions the way a model does: across 28 widely used servers (362 tools, 1,349 parameters) a
+hand-judged sample put roughly 6 in 10 flagged parameters as real gaps, so the rule was tightened until
+its flagged share fell from 28% to 11%. Against Cisco's open-source scanner on a corpus I wrote, Sentinel
+caught 7 of 15 poisoned tool definitions to its 2, and flagged none of the honest-but-scary ones to its
+3, with that corpus's bias and the sample size stated beside the table.
+
+`Go` `Python` `Envoy` `PostgreSQL` `OpenTelemetry` `SARIF` — about 19k lines of Go and 21k of Python,
+more than 650 test functions, `golangci-lint`, `go test -race`, `mypy` and `ruff` enforced in CI, and no
+model API key required anywhere, which is why the suite is fast and never flaky for a reason outside the
+repository.
 
 **[meridian](https://github.com/patsypppe/meridian)** · agent evaluation harness
 
@@ -57,12 +70,28 @@ only have caught a drop of 0.183 or larger; resolving your 0.030 tolerance would
 A PASS from an underpowered suite is not evidence that nothing broke, and a gate that reports those
 identically teaches people to trust it exactly when it is least reliable.
 
-It is also measured by itself, and publishes the result including the miss: 0/30 false regressions,
-4/5 seeded regressions caught, 5/5 replay fidelity. The one it misses is explained with the arithmetic
-rather than tuned away.
+It measures itself, and says what that measurement is. The gate's own statistics were tested against a
+deterministic stand-in for the model (0 false alarms in 30 runs, 4 of 5 seeded regressions caught, 5 of 5
+archived runs replayed exactly), which checks the arithmetic and not a real agent; the one miss is
+explained with its arithmetic rather than tuned away.
 
-`Python 3.12+` `Typer` `Docker` `Postgres + Alembic` `Starlette` `numpy` — `mypy --strict` and `ruff`
-enforced in CI, 331 tests across unit, Docker-backed integration, and end-to-end layers.
+Real models came next, and they were humbling. The same seven-task suite on an open model passed 17 of 70
+trials in one run and 9 of 70 in the next, which is the strongest argument for the minimum-detectable-effect
+line above. Running them also exposed a harness bug: a provider's rate limit was being scored as the agent
+failing. Now an infrastructure error carries a cause (sandbox, grader, model provider and so on), is
+excluded from the score and retried once, and the time a trial spends waiting out a throttle is not counted
+against its deadline. That was found by reading the agent's own transcript: it had finished its work in
+the first reply and then sat in a backoff until the clock ran out.
+
+It also reads Harbor's task format, so established benchmarks can run on it, graded by their own hidden
+tests in a sandbox with no network (a verifier that wants to install packages at test time is refused with
+the reason). Terminal-Bench 2.0 imports 66 of its 89 tasks. No benchmark score is claimed yet, because a
+slice has not been run. A React and TypeScript dashboard reads a run's result file in the browser, and its
+statistics are tested against values exported from the Python implementation so the two cannot drift.
+
+`Python 3.12+` `Typer` `Docker` `Postgres + Alembic` `Starlette` `numpy` `TypeScript` `React` — `mypy --strict`
+and `ruff` enforced in CI, about 570 Python tests across unit, Docker-backed integration, and end-to-end
+layers, plus the dashboard's own.
 
 **[serverless-rideshare-aws](https://github.com/patsypppe/serverless-rideshare-aws)** · serverless AWS backend
 
@@ -114,11 +143,12 @@ Each has a public repository above. Citations and DOIs are on
 
 ## Currently
 
-Building [sentinel](https://github.com/patsypppe/sentinel) out from its MVP tier — the parts deliberately
-left out are named in its scope section, and the next ones in are consent-registry authorization and
-`subscriptions/listen`. Alongside it, taking [meridian](https://github.com/patsypppe/meridian) toward a
-release a team other than mine could adopt, and reading the 2026 literature on eval variance closely
-enough to argue with it.
+Taking [meridian](https://github.com/patsypppe/meridian) from a harness that measures a simulated agent to
+one that reports honestly on real ones: the next step is a first slice of Terminal-Bench 2.0 on a hosted
+model, published with its sample size and every caveat, whatever the score turns out to be. Alongside it,
+[sentinel](https://github.com/patsypppe/sentinel) is being built out from its MVP tier. The parts
+deliberately left out are named in its scope section, and the next ones in are consent-registry
+authorization and `subscriptions/listen`.
 
 The longer version of all of this, with architecture diagrams, is at
 [patsypppe.github.io](https://patsypppe.github.io) — Astro and TypeScript, no client-side JavaScript,
